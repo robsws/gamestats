@@ -45,7 +45,6 @@ if (!isset($data->game) or !isset($data->scores)) {
 
 // Create the parent play object
 $db->beginTransaction();
-$db->exec('SET FOREIGN_KEY_CHECKS=0;');
 try {
     $game = fetchGameByName($db, $data->game);
     if ($game) {
@@ -75,5 +74,4 @@ try {
     http_response_code(500);
     echo json_encode(array("message" => "Unable to record play."));
 }
-$db->exec('SET FOREIGN_KEY_CHECKS=1;');
 ?>
