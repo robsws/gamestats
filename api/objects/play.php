@@ -45,4 +45,32 @@ function fetchMostRecentPlays($conn, $amount) {
     return $play_sth->fetchAll(PDO::FETCH_ASSOC);
 }
 
+function fetchLeaderboard($conn) {
+    $query = "
+        SELECT player.name, g.golds, s.silvers, b.bronzes
+        FROM player
+        LEFT JOIN (
+            SELECT player.id, COUNT(*) as golds
+            FROM player INNER JOIN score on player.id = score.player_id
+            WHERE rank = 1
+            GROUP BY player.id
+        ) g ON player.id = g.id
+        LEFT JOIN (
+            SELECT player.id, COUNT(*) as silvers
+            FROM player INNER JOIN score on player.id = score.player_id
+            WHERE rank = 2
+            GROUP BY player.id
+        ) s ON player.id = s.id
+        LEFT JOIN (
+            SELECT player.id, COUNT(*) as bronzes
+            FROM player INNER JOIN score on player.id = score.player_id
+            WHERE rank = 3
+            GROUP BY player.id
+        ) b ON player.id = s.id
+        ORDER BY g.golds DESC, s.silvers DESC, b.bronzes DESC
+    ";
+    $sth = runSql($conn, $query, array());
+    return $sth->fetchAll(PDO::FETCH_ASSOC);
+}
+
 ?>
