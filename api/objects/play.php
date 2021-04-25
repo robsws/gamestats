@@ -10,15 +10,25 @@ function fetchPlayById($conn, $id) {
     return $sth->fetch(PDO::FETCH_ASSOC);
 }
 
-function addNewPlay($conn, $game_id, $time) {
-    $query = "
+function addNewPlay($conn, $game_id, $time, $tags) {
+    $play_query = "
         INSERT INTO play (game_id, `time`)
         VALUES (:gameid, :time);";
-    $sth = runSql($conn, $query, array(
+    $play_sth = runSql($conn, $play_query, array(
         "gameid" => $game_id,
         "time" => $time
     ));
-    return $conn->lastInsertId();
+    $play_id = $conn->lastInsertId();
+    $tag_query = "
+        INSERT IGNORE INTO tags (play_id, tag)
+        VALUES (:playid, :tag)
+    ";
+    $tag_sth = $conn->prepare($tag_query);
+    foreach ($tags as $tag) {
+        $tag = sanitize($tag);
+        $tag_sth->execute($play_id, $tag);
+    }
+    return $play_id;
 }
 
 function fetchMostRecentPlays($conn, $amount) {

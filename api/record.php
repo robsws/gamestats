@@ -22,16 +22,17 @@ $data = json_decode(file_get_contents("php://input"));
 {
     "game": "game_name",
     "time": "datetime, empty uses current time",
+    "tags": ["tag1", "tag2"],
     "scores": [
         {
             "player": "player_name",
-            "rank": rank (integer)
-            "points": points scored (integer)
+            "rank": rank (integer),
+            "points": points scored (integer),
         },
         {
             "player": "player_name_2",
-            "rank": rank (integer)
-            "points": points scored (integer)
+            "rank": rank (integer),
+            "points": points scored (integer),
         },
         ...
     ]
@@ -55,7 +56,7 @@ try {
     if (!isset($data->time)) {
         $data->time = date('Y-m-d H:i:s');
     }
-    $play_id = addNewPlay($db, $game_id, $data->time);
+    $play_id = addNewPlay($db, $game_id, $data->time, $data->tags);
     // Create a score object for each score
     foreach ($data->scores as $score) {
         $player = fetchPlayerByName($db, $score->player);
