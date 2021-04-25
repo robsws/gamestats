@@ -76,7 +76,7 @@ function fetchLeaderboard($conn) {
             FROM player INNER JOIN score on player.id = score.player_id
             WHERE rank = 3
             GROUP BY player.id
-        ) b ON player.id = s.id
+        ) b ON player.id = b.id
         ORDER BY g.golds DESC, s.silvers DESC, b.bronzes DESC
     ";
     $sth = runSql($conn, $query, array());
