@@ -21,4 +21,28 @@ function addNewPlay($conn, $game_id, $time) {
     return $conn->lastInsertId();
 }
 
+function fetchMostRecentPlays($conn, $amount) {
+    $play_query = "
+        SELECT
+            p.id as play_id,
+            p.time,
+            p.game_name,
+            player.name as player_name,
+            score.rank,
+            score.points
+        FROM
+        (
+            SELECT play.id, play.time, game.name as game_name
+            FROM play INNER JOIN game ON play.game_id = game.id
+            ORDER BY play.time DESC
+            LIMIT ?
+        ) p
+        INNER JOIN score ON p.id = score.play_id
+        INNER JOIN player ON score.player_id = player.id
+        ORDER BY p.time DESC, p.id
+    ";
+    $play_sth = runSql($conn, $play_query, array($amount));
+    return $play_sth->fetchAll(PDO::FETCH_ASSOC);
+}
+
 ?>
